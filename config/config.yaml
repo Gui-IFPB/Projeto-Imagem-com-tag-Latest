@@ -1,0 +1,8 @@
+image: nginx:latest
+
+container_name: nginx_app
+
+interval: 60
+
+ports:
+  "8080": "80"

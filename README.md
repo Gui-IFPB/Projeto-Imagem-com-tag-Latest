@@ -2,42 +2,78 @@
 
 ## Tema do Projeto
 
-Desenvolvimento de um sistema automatizado capaz de monitorar imagens Docker com a tag **`latest`**, detectar novas versões publicadas em um registry e atualizar automaticamente os containers em execução.
+Desenvolvimento de um sistema automatizado capaz de monitorar imagens Docker com a tag **latest**, detectar novas versões publicadas em um registry e atualizar automaticamente os containers em execução.
 
 ---
 
-## Objetivo do Projeto
+# Objetivo do Projeto
 
-O objetivo deste projeto é desenvolver uma solução automatizada capaz de monitorar periodicamente imagens Docker publicadas em registries de containers e identificar alterações em imagens que utilizam a tag **`latest`**.
+O objetivo deste projeto é desenvolver uma solução automatizada capaz de monitorar periodicamente imagens Docker publicadas em registries de containers e identificar alterações em imagens que utilizam a tag **latest**.
 
-Quando uma nova versão da imagem for detectada no registry, o sistema deverá:
+Quando uma nova versão da imagem for detectada, o sistema deverá:
 
-- Identificar a atualização;
-- Baixar a nova imagem;
-- Interromper o container antigo;
-- Remover o container desatualizado;
-- Criar um novo container utilizando a imagem atualizada;
-- Restaurar a execução da aplicação automaticamente.
-
----
-
-## Conceitos Abordados
-
-Este projeto busca explorar conceitos fundamentais relacionados a:
-
-- Gerenciamento de containers;
-- Automação de infraestrutura;
-- Versionamento de imagens;
-- Registries Docker;
-- CI/CD (Continuous Integration / Continuous Delivery);
-- Rolling Updates;
-- Atualização contínua;
-- Observabilidade;
-- Automação operacional.
+* Identificar a atualização;
+* Baixar a nova imagem;
+* Interromper o container antigo;
+* Remover o container desatualizado;
+* Criar um novo container utilizando a imagem atualizada;
+* Restaurar automaticamente a execução da aplicação.
 
 ---
 
-## Fluxo de Funcionamento
+# Conceitos Abordados
+
+Este projeto explora conceitos fundamentais relacionados a:
+
+* Gerenciamento de containers;
+* Docker Engine;
+* Docker Registry;
+* Docker API;
+* Docker SDK for Python;
+* Automação de infraestrutura;
+* Atualização contínua;
+* CI/CD;
+* Observabilidade;
+* Deploy automatizado;
+* Versionamento de imagens;
+* Containers Linux.
+
+---
+
+# Arquitetura da Solução
+
+```text
+                 Docker Registry
+                        │
+                        ▼
+              Verificação Periódica
+                        │
+                        ▼
+             Docker Auto Updater
+                        │
+        ┌───────────────┴───────────────┐
+        ▼                               ▼
+ Verifica nova imagem          Mantém logs
+        │
+        ▼
+ Docker Pull
+        │
+        ▼
+ Parar Container
+        │
+        ▼
+ Remover Container
+        │
+        ▼
+ Criar Novo Container
+        │
+        ▼
+ Aplicação Atualizada
+```
+
+---
+
+# Fluxo de Funcionamento
 
 ```text
 Monitoramento da Imagem
@@ -63,45 +99,40 @@ Aplicação Atualizada em Execução
 
 ---
 
-## Resultado Esperado
+# Tecnologias Utilizadas
 
-Ao final do projeto, o sistema deverá ser capaz de realizar atualizações automáticas de containers Docker sem intervenção manual, garantindo que aplicações executem sempre a versão mais recente disponível da imagem monitorada.
+* Python 3.12
+* Docker Engine
+* Docker SDK for Python
+* PyYAML
+* Logging
+* Docker Compose
+* Linux Ubuntu
 
-## Estrutura Atual do Projeto
+---
 
-Até o momento foi criada a estrutura base da aplicação em Python, utilizando a Docker SDK para comunicação direta com o Docker Engine.
+# Estrutura Final do Projeto
 
 ```text
-docker-auto-updater/
+Projeto-Imagem-com-tag-Latest/
 ├── config/
 │   └── config.yaml
 ├── logs/
+│   └── updater.log
 ├── scheduler/
 │   └── scheduler.py
 ├── updater/
 │   ├── image_checker.py
 │   ├── container_manager.py
 │   └── rollback.py
-├── main.py
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
-└── venv/
+├── main.py
+├── .dockerignore
+├── .gitignore
+└── README.md
 ```
-
----
-
-# Tecnologias Escolhidas
-
-## Python
-
-Foi escolhido Python por possuir uma curva de desenvolvimento rápida, boa integração com Docker através da Docker SDK e facilidade para automação de processos.
-
-## Docker SDK for Python
-
-A biblioteca `docker` foi escolhida para atender ao requisito de utilização da API Docker, evitando a dependência exclusiva da Docker CLI.
-
-## PyYAML
-
-Utilizado para carregar as configurações do sistema a partir de um arquivo externo (`config.yaml`), permitindo alterar parâmetros sem modificar o código-fonte.
 
 ---
 
@@ -111,7 +142,7 @@ Utilizado para carregar as configurações do sistema a partir de um arquivo ext
 
 Arquivo responsável pelas configurações da aplicação.
 
-### Atualmente armazena:
+### Configurações disponíveis
 
 * Imagem monitorada;
 * Nome do container;
@@ -131,9 +162,9 @@ ports:
   "8080": "80"
 ```
 
-### Motivação
+### Objetivo
 
-Centralizar configurações em um único local para facilitar manutenção e testes.
+Permitir alterações de configuração sem necessidade de modificar o código-fonte.
 
 ---
 
@@ -141,140 +172,373 @@ Centralizar configurações em um único local para facilitar manutenção e tes
 
 Responsável pela execução periódica das verificações.
 
-### Função principal
+### Funções
 
-* Executar continuamente o monitoramento em intervalos definidos.
-
-### Motivação
-
-Separar a lógica de agendamento da lógica de atualização.
+* Executar verificações automaticamente;
+* Respeitar o intervalo definido no arquivo de configuração;
+* Manter o monitoramento contínuo.
 
 ---
 
 ## updater/image_checker.py
 
-Responsável por verificar se existe uma nova versão da imagem monitorada.
+Responsável pela detecção de novas versões das imagens.
 
-### Funções implementadas
+### Funções
 
-* Obter a imagem local;
-* Realizar download da imagem mais recente;
-* Comparar versões;
-* Informar se houve atualização.
+* Obter ID da imagem local;
+* Executar Docker Pull;
+* Comparar versões da imagem;
+* Identificar atualizações.
 
-### Motivação
+### Estratégia Utilizada
 
-Manter toda a lógica de detecção de atualizações isolada em um único módulo.
+A detecção ocorre através da comparação entre o ID da imagem local e o ID retornado após o download da imagem mais recente.
 
 ---
 
 ## updater/container_manager.py
 
-Responsável pelo gerenciamento dos containers Docker.
+Responsável pelo gerenciamento dos containers.
 
-### Funções implementadas
+### Funções
 
 * Parar containers;
 * Remover containers;
 * Criar novos containers;
-* Configurar portas automaticamente.
-
-### Motivação
-
-Centralizar toda interação com a Docker API.
+* Aplicar mapeamento de portas;
+* Restaurar automaticamente a aplicação.
 
 ---
 
 ## updater/rollback.py
 
-Módulo reservado para futuras implementações de rollback.
+Módulo preparado para futuras implementações de rollback.
 
-### Atualmente
+### Situação Atual
 
-* Registra eventos de falha durante a atualização.
-
-### Motivação
-
-Preparar a arquitetura para expansão futura sem alterar a estrutura principal do projeto.
+* Estrutura criada;
+* Registro de falhas;
+* Ponto de expansão para futuras versões.
 
 ---
 
 ## main.py
 
-Arquivo principal da aplicação.
+Arquivo principal do sistema.
 
 ### Responsabilidades
 
 * Carregar configurações;
 * Iniciar monitoramento;
 * Coordenar os módulos;
-* Executar o fluxo completo de atualização.
-
-### Fluxo implementado
-
-1. Ler configurações;
-2. Verificar atualização da imagem;
-3. Detectar nova versão;
-4. Parar container antigo;
-5. Remover container antigo;
-6. Criar novo container;
-7. Registrar resultado em log.
+* Executar atualizações automáticas;
+* Registrar logs do processo.
 
 ---
 
-# Dependências Instaladas
+# Sistema de Logs
 
-O projeto utiliza atualmente:
+O projeto registra automaticamente todas as operações realizadas.
 
-```txt
-docker
-PyYAML
-requests
+Arquivo:
+
+```text
+logs/updater.log
 ```
 
-### Instalação
+Exemplo:
+
+```text
+Docker Auto Updater iniciado
+
+Imagem atual: sha256:...
+
+Verificando atualizações para nginx:latest
+
+Nenhuma alteração detectada
+
+Nenhuma atualização encontrada
+```
+
+Os logs permitem acompanhar todo o processo de monitoramento e atualização.
+
+---
+
+# Dockerfile
+
+Foi criado um Dockerfile para permitir a execução da aplicação em containers.
+
+Objetivos:
+
+* Padronizar ambiente;
+* Facilitar implantação;
+* Simplificar execução em outros computadores.
+
+---
+
+# Docker Compose
+
+Foi criado um arquivo docker-compose.yml para facilitar a execução do projeto.
+
+Benefícios:
+
+* Inicialização simplificada;
+* Configuração centralizada;
+* Persistência de logs;
+* Integração com Docker Socket.
+
+---
+
+# Como Executar o Projeto
+
+## Pré-requisitos
+
+Antes de executar o projeto, certifique-se de possuir:
+
+* Linux (Ubuntu recomendado);
+* Docker instalado e em execução;
+* Python 3.12 ou superior;
+* Pip instalado;
+* Acesso ao Docker Engine.
+
+Verificar instalações:
+
+```bash
+docker --version
+
+python3 --version
+
+pip --version
+```
+
+---
+
+## Método 1 — Execução Local com Python
+
+### 1. Clonar o repositório
+
+```bash
+git clone <url-do-repositorio>
+
+cd Projeto-Imagem-com-tag-Latest
+```
+
+### 2. Criar ambiente virtual
+
+```bash
+python3 -m venv venv
+```
+
+### 3. Ativar ambiente virtual
+
+```bash
+source venv/bin/activate
+```
+
+### 4. Instalar dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 5. Executar aplicação
 
-# Estado Atual do Desenvolvimento
+```bash
+python main.py
+```
 
-## Concluído
-
-* Estrutura inicial do projeto;
-* Ambiente Python configurado;
-* Ambiente virtual configurado;
-* Configuração via YAML;
-* Integração inicial com Docker SDK;
-* Módulo de monitoramento;
-* Módulo de gerenciamento de containers;
-* Sistema de logs;
-* Estrutura para rollback.
-
-## Em Desenvolvimento
-
-* Testes integrados;
-* Comparação por digest SHA256;
-* Health Check;
-* Rollback funcional;
-* Dockerfile;
-* Docker Compose;
-* Suporte a múltiplos containers.
+O sistema iniciará o monitoramento automático da imagem configurada.
 
 ---
 
-# Próximos Passos
+## Método 2 — Execução com Docker Compose
 
-1. Executar testes locais;
-2. Validar atualização automática;
-3. Implementar comparação por digest;
-4. Implementar Health Check;
-5. Implementar rollback real;
-6. Criar Dockerfile;
-7. Criar docker-compose.yml;
-8. Finalizar documentação;
-9. Gravar vídeo demonstrativo.
+### Instalar Docker Compose (caso necessário)
+
+Ubuntu:
+
+```bash
+sudo apt update
+
+sudo apt install docker-compose-v2 -y
+```
+
+Verificar instalação:
+
+```bash
+docker compose version
+```
+
+### Construir e iniciar os containers
+
+```bash
+docker compose up -d --build
+```
+
+### Verificar containers em execução
+
+```bash
+docker ps
+```
+
+### Visualizar logs
+
+```bash
+tail -f logs/updater.log
+```
+
+### Encerrar execução
+
+```bash
+docker compose down
+```
+
+---
+
+# Como Testar o Projeto
+
+## Criar Container Monitorado
+
+Criar um container utilizando a imagem monitorada:
+
+```bash
+docker run -d \
+  --name nginx_app \
+  -p 8080:80 \
+  nginx:latest
+```
+
+Verificar se o container está ativo:
+
+```bash
+docker ps
+```
+
+---
+
+## Validar Aplicação
+
+Executar:
+
+```bash
+curl http://localhost:8080
+```
+
+Resultado esperado:
+
+```text
+Welcome to nginx!
+```
+
+---
+
+## Validar Monitoramento
+
+Executar o projeto:
+
+```bash
+python main.py
+```
+
+ou
+
+```bash
+docker compose up -d
+```
+
+Acompanhar logs:
+
+```bash
+tail -f logs/updater.log
+```
+
+Resultado esperado:
+
+```text
+Docker Auto Updater iniciado
+
+Scheduler iniciado
+
+Imagem atual: sha256:...
+
+Verificando atualizações para nginx:latest
+
+Nenhuma alteração detectada
+
+Nenhuma atualização encontrada
+```
+
+O log deverá continuar sendo atualizado automaticamente conforme o intervalo configurado.
+
+---
+
+# Estado Final do Projeto
+
+## Funcionalidades Implementadas
+
+* Monitoramento periódico de imagens Docker;
+* Suporte à tag latest;
+* Download automático de imagens atualizadas;
+* Comparação de versões através do ID da imagem;
+* Integração com Docker SDK;
+* Parada automática de containers;
+* Remoção automática de containers;
+* Criação automática de novos containers;
+* Sistema de logs persistentes;
+* Configuração via arquivo YAML;
+* Execução local via Python;
+* Execução containerizada via Docker Compose;
+* Estrutura preparada para futuras implementações de rollback.
+
+---
+
+# Resultados Obtidos
+
+Durante os testes realizados foi possível validar:
+
+* Monitoramento contínuo funcionando corretamente;
+* Atualização automática da imagem monitorada;
+* Gerenciamento automatizado de containers;
+* Integração bem-sucedida com Docker Engine;
+* Persistência de logs;
+* Execução local e containerizada;
+* Compatibilidade com ambiente Linux.
+
+Todos os requisitos obrigatórios definidos no projeto foram implementados e testados com sucesso.
+
+# Dificuldades Encontradas
+
+Durante o desenvolvimento foram encontrados desafios relacionados a:
+
+* Configuração do ambiente Python;
+* Integração com Docker SDK;
+* Gerenciamento de permissões do Docker;
+* Persistência de logs;
+* Execução containerizada utilizando Docker Compose.
+
+Todos os problemas foram resolvidos durante a implementação e validação do projeto.
+
+---
+
+# Aprendizados Obtidos
+
+Com este projeto foi possível compreender:
+
+* Funcionamento da Docker API;
+* Manipulação de imagens Docker;
+* Gerenciamento de containers via código;
+* Automação de deploy;
+* Monitoramento contínuo;
+* Estruturação de aplicações DevOps;
+* Utilização de Docker Compose;
+* Boas práticas de automação operacional.
+
+---
+
+# Conclusão
+
+O projeto atingiu os objetivos propostos, implementando um sistema capaz de monitorar imagens Docker com tag latest, detectar alterações e atualizar automaticamente containers em execução.
+
+A solução atende aos requisitos mínimos definidos na especificação e fornece uma base sólida para futuras evoluções, como rollback automático, health checks, notificações e suporte a múltiplos containers.
 

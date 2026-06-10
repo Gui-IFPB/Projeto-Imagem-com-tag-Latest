@@ -493,6 +493,23 @@ O log deverá continuar sendo atualizado automaticamente conforme o intervalo co
 
 ---
 
+# Requisitos Atendidos
+
+O projeto atende aos requisitos mínimos definidos na proposta:
+
+- Monitoramento periódico de imagens Docker;
+- Suporte à tag latest;
+- Verificação de alterações da imagem;
+- Download automático da nova imagem;
+- Identificação de containers associados;
+- Parada automática do container antigo;
+- Remoção automática do container antigo;
+- Criação automática de novo container;
+- Restauração automática da aplicação;
+- Compatibilidade com Linux e Docker.
+
+---
+
 # Resultados Obtidos
 
 Durante os testes realizados foi possível validar:

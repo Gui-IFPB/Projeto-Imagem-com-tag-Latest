@@ -1,5 +1,6 @@
 import yaml
 import logging
+import os
 
 from scheduler.scheduler import run_scheduler
 
@@ -15,6 +16,7 @@ from updater.rollback import (
     RollbackManager
 )
 
+os.makedirs("logs", exist_ok=True)
 
 logging.basicConfig(
     filename="logs/updater.log",

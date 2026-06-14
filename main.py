@@ -89,7 +89,19 @@ if __name__ == "__main__":
         "Docker Auto Updater iniciado"
     )
 
-    run_scheduler(
-        INTERVAL,
-        monitor
-    )
+    try:
+
+        run_scheduler(
+            INTERVAL,
+            monitor
+        )
+
+    except KeyboardInterrupt:
+
+        logging.info(
+            "Encerramento solicitado pelo usuário"
+        )
+
+        print(
+            "\nDocker Auto Updater finalizado."
+        )

@@ -6,6 +6,17 @@ Desenvolvimento de um sistema automatizado capaz de monitorar imagens Docker com
 
 ---
 
+##  Equipe
+
+- Guilherme Manoel da Silva
+- Mihael Reinaldo Araújo de Albuquerque Escobar
+- Wellington Antonio da Silva
+
+##  Disciplina
+Virtualização: IFPB - 2026.1
+
+---
+
 # Objetivo do Projeto
 
 O objetivo deste projeto é desenvolver uma solução automatizada capaz de monitorar periodicamente imagens Docker publicadas em registries de containers e identificar alterações em imagens que utilizam a tag **latest**.
